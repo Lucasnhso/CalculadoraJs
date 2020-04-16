@@ -14,8 +14,8 @@ function atribuirEventos(){
     document.querySelector("#btnPonto").addEventListener("click", clicarPonto);
     document.querySelector("#btnResultado").addEventListener("click", clicarResultado);
     
-    let numeros = document.querySelector(".btn-numero");
-    let operadores = document.querySelector(".btn-operador");
+    let numeros = document.querySelectorAll(".btn-numero");
+    let operadores = document.querySelectorAll(".btn-operador");
 
     for (let numero of numeros){
         numero.addEventListener("click", clicarNumero);
@@ -44,21 +44,56 @@ function clicarPonto(){
     if(inputResultado.value == "" || isNaN(inputResultado.value)){
         inputResultado.value = "0.";
     }
-    else if(inputResultado.value.includes(".")){
+    else if(!inputResultado.value.includes(".")){
         inputResultado.Value = inputResultado.value + ".";
     }
 }
 
 function clicarResultado(){
+    if( isNaN(inputResultado.value) && calculo.funcaoParaCalcular.values !=null){
+        let resultado = calculo.funcaoParaCalcular(calculo.valorSalvo, Number(inputResultado.value));
 
+        inserirTextoTextHistorico(inputResultado.value + "\n=" + resultado);
+        inputResultado.value = resultado;
+        calculo.valorSalvo = resultado;
+
+        calculo.funcaoParaCalcular = null;
+    }
 }
 
 function clicarNumero(){
+    let novoValor = event.target.textContent;
 
+    if(isNaN(inputResultado.value)){
+        inserirTextoTextHistorico(inputResultado.Value);
+        inputResultado.value = novoValor;
+    }
+    else{
+        if(inputResultado == 0 && inputResultado.value !== "0."){
+            inputResultado.value = novoValor;
+        }
+        else{
+            inputResultado =+ novoValor;
+        }
+    }
 }
 
 function clicarOperador(){
+    if(!isNaN(inputResultado.value)){
+        let novoValor = Number(inputResultado.value);
+        if(calculo.valorSalvo == null || calculo.funcaoParaCalcular == null){
+            calculo.valorSalvo = novoValor;
+        }
+        else{
+            calculo.valorSalvo = calculo.funcaoParaCalcular(calculo.valorSalvo , novoValor);
+        }
 
+        inserirTextoTextHistorico(calculo.valorSalvo);
+    }
+
+    let operador = event.target.textContent;
+    atribuirOperacao(operador);
+    inputResultado.value = operador;
 }
 
 function somar(valor1, valor2){
@@ -77,6 +112,26 @@ function dividir(valor1, valor2){
     }
     else{
         return valor1 / valor2;
+    }
+}
+
+function atribuirOperacao(operador){
+    switch(operador){
+        case "+":
+            calculo.funcaoParaCalcular = somar;
+            break;
+        case "-":
+            calculo.funcaoParaCalcular = subtrair;
+            break;
+        case "*":
+            calculo.funcaoParaCalcular = multiplicar;
+            break;
+        case "/":
+            calculo.funcaoParaCalcular = dividir;
+            break;
+        default:
+            calculo.funcaoParaCalcular = null;
+            break;
     }
 }
 
